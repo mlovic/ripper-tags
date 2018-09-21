@@ -4,8 +4,16 @@ module RipperTags
 
 class Parser < Ripper
   def self.extract(data, file='(eval)')
+    puts 'extracting...'
     sexp = new(data, file).parse
+    #p sexp
+    #raise
     Visitor.new(sexp, file, data).tags
+  end
+  def initialize(*args)
+    puts 'initting...'
+    puts caller
+    super
   end
 
   SCANNER_EVENTS.each do |event|
@@ -238,6 +246,9 @@ class Parser < Ripper
   end
 
   def on_fcall(*args)
+    puts "on_fcall called by #{Kernel.caller(0).join("\n")}"
+    #binding.irb
+    #raise
     [:fcall, *args]
   end
 
@@ -341,6 +352,8 @@ end
       return unless sexp
       return if Symbol === sexp
 
+      # e.g. sexp
+      #[[:def, "abc", 1], [:def, "a", 2]]
       case sexp[0]
       when Array
         sexp.each{ |child| process(child) }
